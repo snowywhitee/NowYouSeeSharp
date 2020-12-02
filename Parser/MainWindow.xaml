@@ -1,0 +1,391 @@
+﻿<Window x:Class="Parser.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parser"
+        mc:Ignorable="d" FontSize="15"
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="610" Width="1100">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="15" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="15" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="15" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="40" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="15" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="15" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+        
+        
+        <!--Start window view-->
+
+        <TextBlock Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="5" HorizontalAlignment="Center" 
+                   FontSize="30" TextAlignment="Center" Name="prompt">
+            Пожалуйста, подскажите, 
+            <LineBreak />
+            куда сохранять нашу (Вашу) бд?
+            <LineBreak />
+            ..или где её искать?
+        </TextBlock>
+        <TextBox Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="4"
+                 Style="{StaticResource TextBoxStyle}" Name="inputBox" 
+                 IsReadOnly="False" AcceptsTab="False" Height="50" 
+                 VerticalAlignment="Center" VerticalContentAlignment="Center">
+            C:/..
+        </TextBox>
+        <Button Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="4"
+                Name="submitButton" Height="50" Width="200" VerticalAlignment="Bottom" 
+                Click="SubmitButton_Click" Content="Сабмит!" 
+                Style="{StaticResource ButtonStyle}"/>
+
+
+        <!--Grid View-->
+        <TextBlock Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" 
+                   FontSize="15" Text="Приветики)))" Name="msgBox" Visibility="Hidden" />
+        <RadioButton Grid.Column="1" Grid.Row="3" Content="Сокращенно"
+                     Style="{StaticResource RadioButtonStyle}"
+                     IsChecked="True" Name="ShortView" Visibility="Hidden" 
+                     Checked="ShortView_Checked" Width="100"
+                     HorizontalAlignment="Left"/>
+        <RadioButton Grid.Column="1" Grid.Row="3" Content="Полностью"
+                     Style="{StaticResource RadioButtonStyle}"
+                     HorizontalAlignment="Left" Width="100"
+                     Margin="110,0,0,0"
+                     Name="FullView" Visibility="Hidden" Checked="FullView_Checked"/>
+        
+        <!--Pagination-->
+        <Button Grid.Column="7" Grid.Row="3" Width="35" Height="25"
+                Content="&lt;" Name="PageBack" HorizontalAlignment="Left"
+                Style="{StaticResource ButtonStyle}"
+                Visibility="Hidden" VerticalAlignment="Center" Click="PageBack_Click" />
+        <Label Grid.Column="7" Grid.Row="3" Width="70" FontSize="12"
+               VerticalAlignment="Center" Name="PaginationLabel"
+               Margin="45,0,0,0"
+               Content="1 of 1" HorizontalAlignment="Left" Visibility="Hidden" />
+        <Button Grid.Column="7" Grid.Row="3" Name="PageForward"
+                Style="{StaticResource ButtonStyle}"
+                HorizontalAlignment="Left" Height="25" Margin="100,0,0,0"
+                VerticalAlignment="Center" Width="35" Content=">"
+                Visibility="Hidden" Click="PageForward_Click" />
+        <ComboBox Grid.Column="7" Grid.Row="3" x:Name="NumberOfRecords"
+                  Width="50" HorizontalAlignment="Left" Margin="140,0,0,0"
+                  ItemsSource="{Binding pageRecords}"
+                  Visibility="Hidden" SelectedValue="20" SelectionChanged="NumberOfRecords_SelectionChanged" />
+        
+        <!--DataGrids-->
+
+        <DataGrid Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="5" 
+                  Name="dataGrid" AutoGenerateColumns="False" 
+                  Visibility="Hidden" IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding IdStr}" Width="*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Идентификатор угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Name}" Width="2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Наименование угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Description}" Width="3*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Описание угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Source}" Width="2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Источник угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Target}" Width="2*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Объект воздействия угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding ConfidentialityBreach}" Width="*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Нарушение конфиденциальности"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding IntegrityViolation}" Width="*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Нарушение целостности"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Нарушение доступности" Binding="{Binding AccessibilityViolation}" Width="*">
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Нарушение доступности"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="5" 
+                  Name="dataGridShort" AutoGenerateColumns="False" 
+                  Visibility="Hidden" ItemsSource="{Binding data}"
+                  IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding IdStr}" Width="*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Идентификатор угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Name}" Width="4*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Наименование угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+        <DataGrid Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="5" 
+                  Name="dataGridUpdated" AutoGenerateColumns="False" 
+                  Visibility="Hidden" IsReadOnly="True" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id}" Width="*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Идентификатор угрозы"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding StatusStr}" Width="*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Статус"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Before}" Width="4*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Было"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding After}" Width="4*" >
+                    <DataGridTextColumn.HeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBlock TextWrapping="Wrap" Text="Стало"/>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGridTextColumn.HeaderStyle>
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+                            <Setter Property="TextBlock.TextAlignment" Value="Left" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+
+        </DataGrid>
+
+        <!--Buttons-->
+        <Button Grid.Column="1" Grid.Row="7" Style="{StaticResource ButtonStyle}"
+                Name="Refresh" Content="Обновить БД" Visibility="Hidden" Click="Refresh_Click" />
+        <Button Grid.Column="3" Grid.Row="7" Style="{StaticResource ButtonStyle}"
+                Name="BeforeAfter" Content="Было/Стало" Visibility="Hidden" IsEnabled="False" Click="BeforeAfter_Click"/>
+        <Button Grid.Column="5" Grid.Row="7" Style="{StaticResource ButtonStyle}"
+                Name="SaveToFile" Content="Сохранить в файл" Visibility="Hidden" 
+                Grid.ColumnSpan="1" Grid.RowSpan="1" Click="SaveToFile_Click" />
+        <Button Grid.Column="7" Grid.Row="7" Style="{StaticResource ButtonStyle}"
+                Name="Exit" Click="Exit_Click" Content="Выход" Visibility="Hidden" />
+    </Grid>
+</Window>
